@@ -24,11 +24,10 @@ public class RxJavaDemo01 {
                 "White"   // 5 letters
         );
         // 2. Observable 로 생성
-        Observable<String> stringObservable = Observable.fromIterable(colors);
         // 3. 5글자 이상인 색깔을 대문자로 바꿔서 출력한다.
-        stringObservable
+        Observable.fromIterable(colors)
                 .filter(color -> color.length() >= 5)
-                .map(color -> color.toUpperCase())
+                .map(String::toUpperCase)
                 .subscribe(new MyObserver());
 
     }
