@@ -1,9 +1,11 @@
 package org.example.rxjava;
 
+import io.reactivex.rxjava3.core.Observable;
 import org.example.model.Product;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class RxJavaDemo03 {
     public static void main(String[] args) {
@@ -31,5 +33,25 @@ public class RxJavaDemo03 {
         products.add(new Product("삼성 모니터", 400000, 25, 19));
 
 
+        products.stream()
+                .filter(product -> product.getDiscountRate() < 30)  // Observable<Product>
+                .filter(product -> product.getLikes() >= 10)
+                .mapToLong(product -> product.getPrice())  // Stream<Long> --> LongStream
+                .average()
+                .ifPresent(System.out::println);
+
+        // 1. Observable 생성
+        // 2. 데이터 분석.. 좋아요 10개 이상인 상품을 가격 비싼 순서로 탑5 출력
+        // 2-1. 쉬운거.. 할인이 30프로 미만이고 좋아요가 10개 이상인 상품의 이름을 출력 // 평균 가격
+        Observable.fromIterable(products) // Observable<Product>
+                .filter(product -> product.getDiscountRate() < 30)  // Observable<Product>
+                .filter(product -> product.getLikes() >= 10)        // Observable<Product>
+                .map(Product::getPrice)                 // Observable<상품가격> --> Observable<Long>
+                .toList()
+                .map(prices -> prices.stream().mapToLong(Long::longValue).average().orElse(0))
+                .subscribe(
+                        averagePrice -> System.out.println("평균 가격: " + averagePrice),
+                        error -> System.err.println("에러: " + error)
+                );
     }
 }
